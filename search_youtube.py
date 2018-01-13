@@ -1,9 +1,10 @@
 from __future__ import print_function
-from moviepy.editor import *
-import urllib
-import urllib2
-from bs4 import BeautifulSoup
+
 from pytube import YouTube
+from moviepy.editor import *
+import urllib.parse
+import urllib.request
+from bs4 import BeautifulSoup
 import sys
 
 videos = list()
@@ -18,9 +19,9 @@ for videotext in videos:
     print(videoarray)
     artist = videoarray[0]
     song = videoarray[1].rstrip('\n')
-    songtext = urllib.quote(artist + "-" + song)
+    songtext = urllib.parse.quote(artist + "-" + song)
     url = "https://www.youtube.com/results?search_query=" + songtext
-    response = urllib2.urlopen(url)
+    response = urllib.request.urlopen(url)
     html = response.read()
     soup = BeautifulSoup(html, 'html.parser')
     souplist = soup.findAll(attrs={'class':'yt-uix-tile-link'})
@@ -28,12 +29,10 @@ for videotext in videos:
     print(videolink)
     yt = YouTube(videolink)
     filename = artist + "-" + song
-    yt.set_filename(filename)
-    vidinfo = yt.filter('mp4')[-1]
-    print(yt.filter('mp4'))
     try:
-        video = yt.get('mp4',vidinfo.resolution)
-        video.download('/tmp')
+        print('/tmp/'+filename+'.mp4')
+        video = yt.streams.first().download(output_path='/tmp', filename=filename)
+        print(video)
     except OSError:
         print("File Already Exists, continuing.")
     videoClip = VideoFileClip("/tmp/"+filename+".mp4")
