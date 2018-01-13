@@ -4,6 +4,7 @@ from pytube import YouTube
 from moviepy.editor import *
 import urllib.parse
 import urllib.request
+import os
 from bs4 import BeautifulSoup
 import sys
 
@@ -35,19 +36,24 @@ for videotext in videos:
         print(video)
     except OSError:
         print("File Already Exists, continuing.")
-    videoClip = VideoFileClip("/tmp/"+filename+".mp4")
-    w,h = videoClip.size
 
-    text = TextClip(filename, font='Times-Roman',
-                    color='white', fontsize=20)
-    text_color = text.on_color(size=(videoClip.w + text.w,text.h+10),
-                               color=(0,0,0), pos=(6,'center'),
-                               col_opacity=0.6)
-    text_anim = text_color.set_position(
-        lambda t: (max(w/30,int(w-0.5*w*t)),max(5*h/6, int(100*t))) )
+    if not (os.path.isfile('/tmp/_final'+filename+'.mp4')):
+        videoClip = VideoFileClip("/tmp/"+filename+".mp4")
+        w,h = videoClip.size
 
-    final = CompositeVideoClip([videoClip,text_anim])
-    final.set_duration(videoClip.duration).write_videofile('/tmp/final_'+filename+".mp4", codec='libx264')
+        text = TextClip(filename, font='Times-Roman',
+                        color='white', fontsize=20)
+        text_color = text.on_color(size=(videoClip.w + text.w,text.h+10),
+                                   color=(0,0,0), pos=(6,'center'),
+                                   col_opacity=0.6)
+        text_anim = text_color.set_position(
+            lambda t: (max(w/30,int(w-0.5*w*t)),max(5*h/6, int(100*t))) )
+
+        final = CompositeVideoClip([videoClip,text_anim])
+        final.set_duration(videoClip.duration).write_videofile('/tmp/final_'+filename+".mp4", codec='libx264')
+    else:
+        print('Movie Already Exists in final form, skipping compilation.')
+
 
 
 
