@@ -30,14 +30,20 @@ for videotext in videos:
     print(videolink)
     yt = YouTube(videolink)
     filename = artist + "-" + song
-    try:
-        print('/tmp/'+filename+'.mp4')
-        video = yt.streams.filter(subtype='mp4').first().download(output_path='/tmp', filename=filename)
-        print(video)
-    except OSError:
-        print("File Already Exists, continuing.")
+    if os.path.isfile('/tmp/'+filename+'.mp4'):
+        print('Video already downloaded, skipping')
+    else:
+        try:
+            print('/tmp/'+filename+'.mp4')
+            video = yt.streams.filter(subtype='mp4').first().download(output_path='/tmp', filename=filename)
+            print(video)
+        except OSError:
+            print("File Already Exists, continuing.")
 
-    if not (os.path.isfile('/tmp/_final'+filename+'.mp4')):
+
+    if os.path.isfile('/tmp/_final'+filename+'.mp4'):
+        print('Video exists in final form, skipping.')
+    else:
         videoClip = VideoFileClip("/tmp/"+filename+".mp4")
         w,h = videoClip.size
 
@@ -51,8 +57,6 @@ for videotext in videos:
 
         final = CompositeVideoClip([videoClip,text_anim])
         final.set_duration(videoClip.duration).write_videofile('/tmp/final_'+filename+".mp4", codec='libx264')
-    else:
-        print('Movie Already Exists in final form, skipping compilation.')
 
 
 
