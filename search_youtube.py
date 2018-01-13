@@ -31,7 +31,7 @@ for videotext in videos:
     filename = artist + "-" + song
     try:
         print('/tmp/'+filename+'.mp4')
-        video = yt.streams.first().download(output_path='/tmp', filename=filename)
+        video = yt.streams.filter(subtype='mp4').first().download(output_path='/tmp', filename=filename)
         print(video)
     except OSError:
         print("File Already Exists, continuing.")
